@@ -6,7 +6,7 @@ Image Hotspot by DevVn help you add hotspot to your images.
 
 # Used
 
-Copy your shortcode to view eg: [devvn_ihotspot id="YOUR_ID"]
+Copy your shortcode to view eg: <code>[devvn_ihotspot id="YOUR_ID"]</code>
 
 # jQuery plugin include
 
