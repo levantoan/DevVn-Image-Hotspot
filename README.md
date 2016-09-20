@@ -1,7 +1,5 @@
 # DevVn Image Hotspot
 
-# Description
-
 Image Hotspot by DevVn help you add hotspot to your images.
 
 # Used
