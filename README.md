@@ -23,6 +23,26 @@ For basic usage, you can also have a look at the [plugin homepage](http://levant
 
 For more information, see [Releases](http://levantoan.com/devvn-image-hotspot).
 
+= 1.0.4 =
+
+* Edit: Don't show tooltip when empty content
+
+= 1.0.3 =
+
+* Add Pulse to pins
+* Edit style
+
+= 1.0.2 =
+
+* Edit css
+* Compress css and js in frontend
+* Add donate button in side
+
+= 1.0.1 =
+
+* [ADD] Link to pins
+* [ADD] Custom different icons and different hover icons.
+
 = 1.0 =
 
 * Update new plugin

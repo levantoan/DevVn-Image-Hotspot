@@ -1,3 +1,9 @@
+.devvn_row,
+.devvn_col_3{
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
 .images_wrap img{
 	width: 100%;
 	height: auto;
@@ -161,11 +167,12 @@ input.shortcodemap {
     padding: 10px 15px;
     vertical-align: middle;
 }
-.has-image .hidden-has-value,
+.has-image > .hidden-has-value,
 .view-has-value {
     display: none !important;
 }
-.has-image .view-has-value{
+.has-image > .view-has-value,
+.has-image .svl-control .view-has-value{
 	display: inline-block !important;
 }
 .view-has-value {
@@ -254,4 +261,16 @@ div#misc-publishing-actions #visibility {
     color: #fff;
     background-color: #c9302c;
     border-color: #ac2925;
+}
+.devvn_row {
+    margin: 10px -5px;
+    overflow: hidden;
+}
+.devvn_col_3 {
+    padding: 0 5px;
+    width: 33.333%;
+    float: left;
+}
+.devvn_row input[type="text"] {
+    width: 100%;
 }

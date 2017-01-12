@@ -1,36 +1,39 @@
 <?php
 /*
-Plugin Name: Image Hotspot by DevVn
+Plugin Name: Image Hotspot by DevVN
 Plugin URI: http://levantoan.com/devvn-image-hotspot
 Description: Image Hotspot help you add hotspot to your images.
 Author: Le Van Toan
-Version: 1.0
+Version: 1.0.4
 Author URI: http://levantoan.com/
 License: GPL2
 Text Domain: devvn
 
-Image Hotspot by DevVn is free software: you can redistribute it and/or modify
+Image Hotspot by DevVN is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 2 of the License, or
 any later version.
  
-Image Hotspot by DevVn is distributed in the hope that it will be useful,
+Image Hotspot by DevVN is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.
  
 You should have received a copy of the GNU General Public License
-along with Image Hotspot by DevVn. If not, see http://www.gnu.org/licenses/gpl-2.0.html.
+along with Image Hotspot by DevVN. If not, see http://www.gnu.org/licenses/gpl-2.0.html.
 */
 
 defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 
-define('DEVVN_IHOTSPOT_VER', '1.0');
+define('DEVVN_IHOTSPOT_VER', '1.0.4');
+define('DEVVN_IHOTSPOT_DEV_MOD', false);
+
 define('DEVVN_IHOTSPOT_POINT_DEFAULT',serialize(array(
 	'countPoint'	=>	'',
 	'content'		=>	'',
 	'left'			=>	'',
-	'top'			=>	''
+	'top'			=>	'',
+	'linkpins'		=>	'',
 )));
 define('DEVVN_IHOTSPOT_PINS_DEFAULT',serialize(array(
 	'countPoint'	=>	'',
@@ -42,6 +45,7 @@ define('DEVVN_IHOTSPOT_PINS_DEFAULT',serialize(array(
 //include
 include 'admin/inc/cpt-ihotspot.php';
 include 'admin/inc/add_shortcode_devvn_ihotspot.php';
+include 'admin/inc/metabox-donate.php';
 
 //metabox
 function devvn_ihotspot_meta_box() {
@@ -73,7 +77,7 @@ function devvn_ihotspot_meta_box_callback( $post ) {
 	//add none field
 	wp_nonce_field( 'maps_points_save_meta_box_data', 'maps_points_meta_box_nonce' );
 	
-	$data_post = maybe_unserialize( $post->post_content );
+	$data_post = maybe_unserialize( $post->post_content );	
 	
 	$maps_images = (isset($data_post['maps_images']))?$data_post['maps_images']:'';
 	$data_points = (isset($data_post['data_points']))?$data_post['data_points']:'';
@@ -85,9 +89,10 @@ function devvn_ihotspot_meta_box_callback( $post ) {
 		'custom_top'		=>	0,
 		'custom_left'		=>	0,
 		'custom_hover_top'	=>	0,
-		'custom_hover_left'	=>	0
+		'custom_hover_left'	=>	0,
+		'pins_animation'	=>	'none'
 	));
-	?>
+	?>	
 	<table class="svl-table">
 		<tbody>
 			<tr>
@@ -139,6 +144,17 @@ function devvn_ihotspot_meta_box_callback( $post ) {
 					</div>
 				</td>				
 			</tr>
+			<tr>
+				<td class="svl-label"><?php _e('Pins Animation','devvn')?></td>
+				<td class="svl-input">
+					<div class="pins-position-wrap">
+						<p>
+							<label><input type="radio" name="pins_animation" value="none" <?=($pins_more_option['pins_animation'] == 'none'?'checked="checked"':'')?>><?php _e('None','devvn')?></label>
+							<label><input type="radio" name="pins_animation" value="pulse" <?=($pins_more_option['pins_animation'] == 'pulse'?'checked="checked"':'')?>><?php _e('Pulse','devvn')?></label>							
+						</p>
+					</div>
+				</td>				
+			</tr>
 		</tbody>
 	</table>
 	<div class="svl-image-wrap <?=($maps_images)?'has-image':''?>">	
@@ -161,7 +177,10 @@ function devvn_ihotspot_meta_box_callback( $post ) {
 		 		'countPoint'	=>	$stt,
 				'imgPoint'		=>	$pins_image,
 				'top'			=>	$point['top'],
-				'left'			=>	$point['left']
+				'left'			=>	$point['left'],
+				'linkpins'		=>	isset($point['linkpins'])?esc_url($point['linkpins']):'',
+				'pins_image_custom'		=>	isset($point['pins_image_custom'])?$point['pins_image_custom']:'',
+				'pins_image_hover_custom'	=>	isset($point['pins_image_hover_custom'])?$point['pins_image_hover_custom']:''
 		 	);
 		 	echo devvn_ihotspot_get_pins_default($data_input);?>
 			<?php $stt++;endforeach;?>
@@ -175,14 +194,17 @@ function devvn_ihotspot_meta_box_callback( $post ) {
 		 		'countPoint'	=>	$stt,
 				'content'		=>	$point['content'],
 				'left'			=>	$point['left'],
-				'top'			=>	$point['top']
+				'top'			=>	$point['top'],
+				'linkpins'		=>	isset($point['linkpins'])?esc_url($point['linkpins']):'',
+				'pins_image_custom'		=>	isset($point['pins_image_custom'])?$point['pins_image_custom']:'',
+				'pins_image_hover_custom'		=>	isset($point['pins_image_hover_custom'])?$point['pins_image_hover_custom']:''			
 		 	);
 		 	echo devvn_ihotspot_get_input_point_default($data_input);?> 
 	 	 <?php $stt++;endforeach;?>
  	 <?php else:?>
  		<div style="display: none;"><?php wp_editor('', '_devvn_ihotspot_default_content'); ?></div>
 	<?php endif;?>	 	 
-	</div>	 
+	</div>
 	<?php
 }
 function devvn_ihotspot_shortcode_callback( $post ){
@@ -234,12 +256,15 @@ function devvn_ihotspot_save_meta_box_data( $post_id ) {
 	$custom_hover_top = sanitize_text_field((isset($_POST['custom_hover_top']))?$_POST['custom_hover_top']:'');
 	$custom_hover_left = sanitize_text_field((isset($_POST['custom_hover_left']))?$_POST['custom_hover_left']:'');
 	
+	$pins_animation = sanitize_text_field((isset($_POST['pins_animation']))?$_POST['pins_animation']:'');
+	
 	$pins_more_option = array(
 		'position'			=>	$choose_type,
 		'custom_top'		=>	$custom_top,
 		'custom_left'		=>	$custom_left,
 		'custom_hover_top'	=>	$custom_hover_top,
-		'custom_hover_left'	=>	$custom_hover_left
+		'custom_hover_left'	=>	$custom_hover_left,
+		'pins_animation'	=>	$pins_animation
 	);
 	if(is_array($pointdata)){
 		$dataPoints = devvn_ihotspot_convert_array_data($pointdata);
@@ -302,10 +327,10 @@ function devvn_ihotspot_admin_script() {
 	    wp_enqueue_script( 'jquery-ui-core' );
 		wp_enqueue_script('jquery-ui-droppable');		
 	    
-		wp_register_script( 'bootstrap-js', plugin_dir_url( __FILE__ ) . 'admin/js/bootstrap.min.js', array( 'jquery' ) );
+		wp_register_script( 'bootstrap-js', plugin_dir_url( __FILE__ ) . 'admin/js/bootstrap.min.js', array( 'jquery' ), DEVVN_IHOTSPOT_VER, true );
 		wp_enqueue_script( 'bootstrap-js' );
 		
-		wp_register_script( 'maps_points', plugin_dir_url( __FILE__ ) . 'admin/js/maps_points.js', array( 'jquery' ) );
+		wp_register_script( 'maps_points', plugin_dir_url( __FILE__ ) . 'admin/js/maps_points.js', array( 'jquery' ), DEVVN_IHOTSPOT_VER, true );
 		wp_localize_script( 'maps_points', 'meta_image',
 			array(
 				'title' 		=> __( 'Select image', 'devvn' ),
@@ -324,33 +349,40 @@ add_action( 'admin_enqueue_scripts','devvn_ihotspot_admin_script' );
 function devvn_ihotspot_admin_styles(){
 	global $typenow;
 	if( $typenow == 'points_image' ) {
-		wp_enqueue_style( 'bootstrap', plugin_dir_url( __FILE__ ) . 'admin/css/bootstrap.css' );
-		wp_enqueue_style( 'maps_points', plugin_dir_url( __FILE__ ) . 'admin/css/maps_points_style.css' );
+		wp_enqueue_style( 'bootstrap', plugin_dir_url( __FILE__ ) . 'admin/css/bootstrap.css', array(), DEVVN_IHOTSPOT_VER, 'all' );
+		wp_enqueue_style( 'maps_points', plugin_dir_url( __FILE__ ) . 'admin/css/maps_points_style.css', array(),DEVVN_IHOTSPOT_VER, 'all' );
 	}
 }
 add_action( 'admin_print_styles', 'devvn_ihotspot_admin_styles' );
 
 /*Add frontend scripts*/
 function devvn_ihotspot_frontend_scripts() {
-	wp_enqueue_style('powertip',plugin_dir_url( __FILE__ ) . 'frontend/css/jquery.powertip.min.css',array(),'1.2.0','all');
-	wp_enqueue_script( 'powertip', plugin_dir_url( __FILE__ ) . 'frontend/js/jquery.powertip.min.js', array('jquery'), '1.2.0', true );
-	
-	wp_enqueue_style('maps-points',plugin_dir_url( __FILE__ ) . 'frontend/css/maps_points.css',array(), DEVVN_IHOTSPOT_VER,'all');
-	wp_enqueue_script( 'maps-points', plugin_dir_url( __FILE__ ) . 'frontend/js/maps_points.js', array('jquery'), DEVVN_IHOTSPOT_VER, true );	
+	if(DEVVN_IHOTSPOT_DEV_MOD){
+		wp_enqueue_style('powertip',plugin_dir_url( __FILE__ ) . 'frontend/css/jquery.powertip.min.css',array(),'1.2.0','all');
+		wp_enqueue_script( 'powertip', plugin_dir_url( __FILE__ ) . 'frontend/js/jquery.powertip.min.js', array('jquery'), '1.2.0', true );
+		
+		wp_enqueue_style('maps-points',plugin_dir_url( __FILE__ ) . 'frontend/css/maps_points.css',array(), DEVVN_IHOTSPOT_VER,'all');
+		wp_enqueue_script( 'maps-points', plugin_dir_url( __FILE__ ) . 'frontend/js/maps_points.js', array('jquery'), DEVVN_IHOTSPOT_VER, true );
+	}else{		
+		wp_enqueue_style('ihotspot',plugin_dir_url( __FILE__ ) . 'frontend/css/ihotspot.min.css',array(),DEVVN_IHOTSPOT_VER,'all');
+		wp_enqueue_script( 'ihotspot-js', plugin_dir_url( __FILE__ ) . 'frontend/js/jquery.ihotspot.min.js', array('jquery'), DEVVN_IHOTSPOT_VER, true );		
+	}	
 }
 add_action( 'wp_enqueue_scripts', 'devvn_ihotspot_frontend_scripts' );
 
 function devvn_ihotspot_get_input_point_default($data = array()){
 	if(!is_array($data)) $data = array();
 	$data = wp_parse_args($data,unserialize(DEVVN_IHOTSPOT_POINT_DEFAULT));
-	
-	$countPoint 	= $data['countPoint'];
-	$pointContent 	= $data['content'];
-	$pointLeft 		= $data['left'];
-	$pointTop 		= $data['top'];
-	
+		
+	$countPoint 				= isset($data['countPoint'])?$data['countPoint']:'';
+	$pointContent 				= isset($data['content'])?$data['content']:'';
+	$pointLeft 					= isset($data['left'])?$data['left']:'';
+	$pointTop 					= isset($data['top'])?$data['top']:'';
+	$pointLink 					= isset($data['linkpins'])?$data['linkpins']:'';
+	$pins_image_custom 			= isset($data['pins_image_custom'])?$data['pins_image_custom']:'';
+	$pins_image_hover_custom	= isset($data['pins_image_hover_custom'])?$data['pins_image_hover_custom']:'';	
 	ob_start();
-	?>
+	?>	
 	<div class="modal fade list_points" tabindex="-1" role="dialog" id="info_draggable<?php echo $countPoint?>" data-points="<?php echo $countPoint?>">
 	 	<div class="modal-dialog" role="document">
 			<div class="modal-content">
@@ -369,6 +401,35 @@ function devvn_ihotspot_get_input_point_default($data = array()){
 					);
 					wp_editor($pointContent, 'point_content'.$countPoint, $settings);
 					?>
+					<div class="devvn_row">
+						<div class="devvn_col_3">
+							<label>Link to pins<br>
+							<input type="text" name="pointdata[linkpins][]" value="<?php echo $pointLink?>" placeholder="Link to pins"/>
+							</label>
+						</div>	
+						<div class="devvn_col_3">
+							<label><?php _e('Pin Image Custom','devvn');?></label>
+							<div class="svl-upload-image <?=($pins_image_custom)?'has-image':''?>">						
+								<div class="view-has-value">
+									<input type="hidden" name="pointdata[pins_image_custom][]" class="pins_image" value="<?php echo $pins_image_custom; ?>" />								
+									<img src="<?=$pins_image_custom?>" class="image_view pins_img"/>									
+									<a href="#" class="svl-delete-image">x</a>
+								</div>
+								<div class="hidden-has-value"><input type="button" class="button-upload button" value="<?php _e( 'Select pins', 'devvn' )?>" /></div>
+							</div>
+						</div>
+						<div class="devvn_col_3">
+							<label><?php _e( 'Pins hover image custom', 'devvn' )?></label>
+							<div class="svl-upload-image <?=($pins_image_hover_custom)?'has-image':''?>">						
+								<div class="view-has-value">
+									<input type="hidden" name="pointdata[pins_image_hover_custom][]" class="pins_image_hover" value="<?php echo $pins_image_hover_custom; ?>" />								
+									<img src="<?=$pins_image_hover_custom?>" class="image_view pins_img_hover"/>									
+									<a href="#" class="svl-delete-image">x</a>
+								</div>
+								<div class="hidden-has-value"><input type="button" class="button-upload button" value="<?php _e( 'Select pins hover', 'devvn' )?>" /></div>
+							</div>
+						</div>					
+					</div>
 					<p>
 						<input type="hidden" name="pointdata[top][]" min="0" max="100" step="any" value="<?php echo $pointTop?>" />
 					</p>
@@ -383,7 +444,7 @@ function devvn_ihotspot_get_input_point_default($data = array()){
 			</div><!-- /.modal-content -->
 		</div><!-- /.modal-dialog -->
 	</div><!-- /.modal -->		
-	<?php	
+	<?php		
 	return ob_get_clean();
 }
 
@@ -394,6 +455,8 @@ function devvn_ihotspot_get_pins_default($datapin = array()){
 	$imgPin = $datapin['imgPoint'];
 	$topPin = $datapin['top'];
 	$leftPin = $datapin['left'];
+	$pins_image_custom = $datapin['pins_image_custom'];
+	if($pins_image_custom) $imgPin = $pins_image_custom;
 	ob_start();
 	?>
 	<div id="draggable<?php echo $countPoint?>" data-points="<?php echo $countPoint?>" class="drag_element" <?php if($topPin && $leftPin):?> style="top:<?php echo $topPin?>%; left:<?php echo $leftPin?>%;"<?php endif;?>>

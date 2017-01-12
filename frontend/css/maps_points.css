@@ -138,11 +138,11 @@
 	width: inherit;
     max-width: inherit;
 }
-img.pins_image_hover,
-.point_style.has-hover:hover img.pins_image {
+body .wrap_svl img.pins_image_hover,
+body .wrap_svl .point_style.has-hover:hover img.pins_image {
     display: none;
 }
-.point_style.has-hover:hover img.pins_image_hover {
+body .wrap_svl .point_style.has-hover:hover img.pins_image_hover {
     display: block;
 }
 .tolltip_points{
@@ -254,4 +254,26 @@ ul.list_content_point li.mail_point:before {
 }
 .wrap_svl_center_box {
     display: inline-block;
+}
+body .point_style a img {
+    max-width: inherit;
+    vertical-align: inherit;
+}
+.pins_animation{
+	border: 3px solid rgba(255,255,255,.5);
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    border-radius: 50%;
+    -moz-border-radius: 50%;
+    -webkit-border-radius: 50%;
+    box-shadow: 0 0 20px rgba(255,255,255,.5);
+    pointer-events: none;
+}
+.pins_animation.ihotspot_pulse{
+    -moz-animation: Ani 2s infinite;
+    -webkit-animation: Ani 2s infinite;
+    animation: Ani 2s infinite;
 }
