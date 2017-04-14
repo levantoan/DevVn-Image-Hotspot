@@ -115,8 +115,7 @@ jQuery(document).ready(function($){
 			beforeSend: function(){
 				$(this).parent().addClass('adding_point');
 			},
-			success: function(response) {	
-				console.log(response);
+			success: function(response) {
 				if(response.success === true) {
 					var data = response.data;
 					$('.wrap_svl').append(data.point_pins);  

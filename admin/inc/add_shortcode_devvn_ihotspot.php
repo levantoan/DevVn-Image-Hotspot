@@ -29,7 +29,7 @@ function devvn_ihotspot_shortcode_func($atts){
 	?>
 	<div class="wrap_svl_center">
 	<div class="wrap_svl_center_box">
-	<div class="wrap_svl" id="body_drag">
+	<div class="wrap_svl" id="body_drag_<?php echo $idPost;?>">
 		<div class="images_wrap">
 		<img src="<?php echo $maps_images; ?>">
 		</div>	
@@ -39,10 +39,13 @@ function devvn_ihotspot_shortcode_func($atts){
 		$pins_image_hover = (isset($data_post['pins_image_hover']))?$data_post['pins_image_hover']:'';
 		
 		 $linkpins = isset($point['linkpins'])?esc_url($point['linkpins']):'';	 
-		 $pins_image_custom = isset($point['pins_image_custom'])?esc_url($point['pins_image_custom']):'';	 
+		 $pins_image_custom = isset($point['pins_image_custom'])?esc_url($point['pins_image_custom']):'';
 		 $pins_image_hover_custom = isset($point['pins_image_hover_custom'])?esc_url($point['pins_image_hover_custom']):'';
+		 $placement = (isset($point['placement']) && $point['placement'] != '')?esc_attr($point['placement']):'n';
+		 $pins_id = (isset($point['pins_id']) && $point['pins_id'] != '')?esc_attr($point['pins_id']):'';
+         $pins_class = (isset($point['pins_class']) && $point['pins_class'] != '')?esc_attr($point['pins_class']):'';
 
-		 if($pins_image_custom) $pins_image = $pins_image_custom;
+         if($pins_image_custom) $pins_image = $pins_image_custom;
 		 if($pins_image_hover_custom) $pins_image_hover = $pins_image_hover_custom;
 		 
 		 $noTooltip = false;
@@ -57,8 +60,8 @@ function devvn_ihotspot_shortcode_func($atts){
 		 <?php
 		 $view_html = ob_get_clean();
 		 ?>
-		 <div class="drag_element tips" style="top:<?php echo $point['top']?>%;left:<?php echo $point['left']?>%;" >
-		 	<div class="point_style <?php echo ($pins_image_hover)?'has-hover':''?> ihotspot_tooltop_html" data-html="<?php echo esc_html($view_html)?>">		 		
+		 <div class="drag_element tips <?php echo ($pins_class)?$pins_class:''?>" style="top:<?php echo $point['top']?>%;left:<?php echo $point['left']?>%;" <?php echo ($pins_id)?'id="'.$pins_id.'"':''?>>
+		 	<div class="point_style <?php echo ($pins_image_hover)?'has-hover':''?> ihotspot_tooltop_html" data-placement="<?php echo esc_attr($placement);?>" data-html="<?php echo esc_html($view_html)?>">
 		 		<?php if($linkpins):?><a href="<?php echo $linkpins;?>"><?php endif;?>
 			 		<?php if($pins_more_option['pins_animation'] != 'none'):?>
 			 			<div class="pins_animation ihotspot_<?php echo $pins_more_option['pins_animation'];?>" style="top:-<?php echo $pins_more_option['custom_top']?>px;left:-<?php echo $pins_more_option['custom_left']?>px;height:<?php echo intval($pins_more_option['custom_top']*2)?>px;width:<?php echo intval($pins_more_option['custom_left']*2)?>px"></div>

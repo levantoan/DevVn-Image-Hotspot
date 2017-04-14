@@ -42,6 +42,15 @@ For basic usage, you can also have a look at the [plugin homepage](http://levant
 == Changelog ==
 
 For more information, see [Releases](http://levantoan.com/devvn-image-hotspot).
+= 1.0.6 =
+
+* Add: ID and Class for pins
+
+= 1.0.5 =
+
+* Add: Select Placement for each Pin
+* Update PowerTip: PowerTip 1.3.0
+
 = 1.0.4 =
 
 * Edit: Don't show tooltip when empty content

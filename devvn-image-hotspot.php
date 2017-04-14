@@ -4,7 +4,7 @@ Plugin Name: Image Hotspot by DevVN
 Plugin URI: http://levantoan.com/devvn-image-hotspot
 Description: Image Hotspot help you add hotspot to your images.
 Author: Le Van Toan
-Version: 1.0.4
+Version: 1.0.6
 Author URI: http://levantoan.com/
 License: GPL2
 Text Domain: devvn
@@ -25,7 +25,7 @@ along with Image Hotspot by DevVN. If not, see http://www.gnu.org/licenses/gpl-2
 
 defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 
-define('DEVVN_IHOTSPOT_VER', '1.0.4');
+define('DEVVN_IHOTSPOT_VER', '1.0.6');
 define('DEVVN_IHOTSPOT_DEV_MOD', false);
 
 define('DEVVN_IHOTSPOT_POINT_DEFAULT',serialize(array(
@@ -34,6 +34,9 @@ define('DEVVN_IHOTSPOT_POINT_DEFAULT',serialize(array(
 	'left'			=>	'',
 	'top'			=>	'',
 	'linkpins'		=>	'',
+	'placement'     =>  '',
+	'pins_id'       =>  '',
+	'pins_class'    =>  ''
 )));
 define('DEVVN_IHOTSPOT_PINS_DEFAULT',serialize(array(
 	'countPoint'	=>	'',
@@ -180,7 +183,10 @@ function devvn_ihotspot_meta_box_callback( $post ) {
 				'left'			=>	$point['left'],
 				'linkpins'		=>	isset($point['linkpins'])?esc_url($point['linkpins']):'',
 				'pins_image_custom'		=>	isset($point['pins_image_custom'])?$point['pins_image_custom']:'',
-				'pins_image_hover_custom'	=>	isset($point['pins_image_hover_custom'])?$point['pins_image_hover_custom']:''
+				'pins_image_hover_custom'	=>	isset($point['pins_image_hover_custom'])?$point['pins_image_hover_custom']:'',
+				'placement'	=>	isset($point['placement'])?$point['placement']:'',
+				'pins_id'	=>	isset($point['pins_id'])?$point['pins_id']:'',
+				'pins_class'	=>	isset($point['pins_class'])?$point['pins_class']:''
 		 	);
 		 	echo devvn_ihotspot_get_pins_default($data_input);?>
 			<?php $stt++;endforeach;?>
@@ -197,7 +203,10 @@ function devvn_ihotspot_meta_box_callback( $post ) {
 				'top'			=>	$point['top'],
 				'linkpins'		=>	isset($point['linkpins'])?esc_url($point['linkpins']):'',
 				'pins_image_custom'		=>	isset($point['pins_image_custom'])?$point['pins_image_custom']:'',
-				'pins_image_hover_custom'		=>	isset($point['pins_image_hover_custom'])?$point['pins_image_hover_custom']:''			
+				'pins_image_hover_custom'		=>	isset($point['pins_image_hover_custom'])?$point['pins_image_hover_custom']:'',
+				'placement'		=>	isset($point['placement'])?$point['placement']:'',
+				'pins_id'	=>	isset($point['pins_id'])?$point['pins_id']:'',
+				'pins_class'	=>	isset($point['pins_class'])?$point['pins_class']:''
 		 	);
 		 	echo devvn_ihotspot_get_input_point_default($data_input);?> 
 	 	 <?php $stt++;endforeach;?>
@@ -380,7 +389,10 @@ function devvn_ihotspot_get_input_point_default($data = array()){
 	$pointTop 					= isset($data['top'])?$data['top']:'';
 	$pointLink 					= isset($data['linkpins'])?$data['linkpins']:'';
 	$pins_image_custom 			= isset($data['pins_image_custom'])?$data['pins_image_custom']:'';
-	$pins_image_hover_custom	= isset($data['pins_image_hover_custom'])?$data['pins_image_hover_custom']:'';	
+	$pins_image_hover_custom	= isset($data['pins_image_hover_custom'])?$data['pins_image_hover_custom']:'';
+	$placement	= isset($data['placement'])?$data['placement']:'';
+	$pins_id	= isset($data['pins_id'])?$data['pins_id']:'';
+	$pins_class	= isset($data['pins_class'])?$data['pins_class']:'';
 	ob_start();
 	?>	
 	<div class="modal fade list_points" tabindex="-1" role="dialog" id="info_draggable<?php echo $countPoint?>" data-points="<?php echo $countPoint?>">
@@ -429,6 +441,38 @@ function devvn_ihotspot_get_input_point_default($data = array()){
 								<div class="hidden-has-value"><input type="button" class="button-upload button" value="<?php _e( 'Select pins hover', 'devvn' )?>" /></div>
 							</div>
 						</div>					
+					</div>
+					<div class="devvn_row">
+						<div class="devvn_col_3">
+							<label>Placement<br></label>
+							<select name="pointdata[placement][]">
+							    <?php
+							    $allPlacement = array(
+                                    'n' =>  'North',
+                                    'e' =>  'East',
+                                    's' =>  'South',
+                                    'w' =>  'West',
+                                    'nw' =>  'North West',
+                                    'ne' =>  'North East',
+                                    'sw' =>  'South West',
+                                    'se' =>  'South East'
+							    );
+							    foreach ($allPlacement as $k=>$v){
+                                ?>
+							    <option value="<?php echo $k;?>" <?php selected($k,$placement)?>><?php echo $v;?></option>
+							    <?php }?>
+                            </select>
+						</div>
+						<div class="devvn_col_3">
+							<label>Pins ID<br>
+							<input type="text" name="pointdata[pins_id][]" value="<?php echo $pins_id?>" placeholder="Type a ID"/>
+							</label>
+                        </div>
+                        <div class="devvn_col_3">
+							<label>Pins Class<br>
+							<input type="text" name="pointdata[pins_class][]" value="<?php echo $pins_class?>" placeholder="Ex: class_1 class_2 class_3"/>
+							</label>
+                        </div>
 					</div>
 					<p>
 						<input type="hidden" name="pointdata[top][]" min="0" max="100" step="any" value="<?php echo $pointTop?>" />
@@ -501,14 +545,14 @@ function devvn_ihotspot_clone_point_func() {
  * */
 function devvn_ihotspot_convert_array_data($inputArray = array()){
 	$aOutput =  array();		
-	$firstKey;
+	$firstKey = null;
 	foreach ($inputArray as $key => $value){
 		$firstKey = $key;
 		break;
 	}
 	$nCountKey = count($inputArray[$firstKey]);
 	for ($i =0; $i<$nCountKey;$i++){
-		$element;
+		$element = array();
 		foreach ($inputArray as $key => $value){
 			$element[$key] = wp_kses_post($value[$i]);
 		}

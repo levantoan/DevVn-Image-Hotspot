@@ -255,9 +255,16 @@ ul.list_content_point li.mail_point:before {
 .wrap_svl_center_box {
     display: inline-block;
 }
-body .point_style a img {
+body .point_style a img,
+body .point_style img {
     max-width: inherit;
     vertical-align: inherit;
+    border-radius: 0;
+    -moz-border-radius: 0;
+    -webkit-border-radius: 0;
+    box-shadow: none;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
 }
 .pins_animation{
 	border: 3px solid rgba(255,255,255,.5);

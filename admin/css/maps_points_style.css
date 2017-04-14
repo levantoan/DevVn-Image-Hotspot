@@ -271,6 +271,7 @@ div#misc-publishing-actions #visibility {
     width: 33.333%;
     float: left;
 }
-.devvn_row input[type="text"] {
+.devvn_row input[type="text"],
+.devvn_row select{
     width: 100%;
 }
